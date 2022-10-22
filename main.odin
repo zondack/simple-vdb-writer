@@ -99,6 +99,21 @@ Node_3 :: struct {
 	data:    [512]f16,
 }
 
+destroy_root :: proc(root : ^VDB) {
+	destroy_node5(&root.node_5)
+}
+
+destroy_node5 :: proc(node : ^Node_5) {
+	for _, n in node.nodes_4 do destroy_node4(n)
+	delete(node.nodes_4)
+}
+
+destroy_node4 :: proc(node : ^Node_4) {
+	for _, n in node.nodes_3 do free(n)
+	delete(node.nodes_3)
+	free(node)
+}
+
 get_bit_index_4 :: proc(p: [3]u32) -> u32 {
 	p := p & u32(4096-1);
 	idx_3d := [3]u32{p.x >> 7, p.y >> 7, p.z >> 7};
@@ -327,7 +342,10 @@ write_vdb :: proc(b: ^bytes.Buffer, vdb: ^VDB, mat: matrix[4, 4]f64) {
 
 main :: proc() {
 	b: bytes.Buffer;
+	defer bytes.buffer_destroy(&b)
+
 	vdb: VDB;
+	defer destroy_root(&vdb)
 
 	R :: 128;
 	D :: R * 2;
