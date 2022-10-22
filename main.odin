@@ -270,25 +270,8 @@ write_metadata :: proc(b: ^bytes.Buffer) {
 write_transform :: proc(b: ^bytes.Buffer, mat: matrix[4, 4]f64) {
 	write_name(b, "AffineMap");
 
-	write_f64(b, mat[0, 0]);
-	write_f64(b, mat[1, 0]);
-	write_f64(b, mat[2, 0]);
-	write_f64(b, 0);
-
-	write_f64(b, mat[0, 1]);
-	write_f64(b, mat[1, 1]);
-	write_f64(b, mat[2, 1]);
-	write_f64(b, 0);
-
-	write_f64(b, mat[0, 2]);
-	write_f64(b, mat[1, 2]);
-	write_f64(b, mat[2, 2]);
-	write_f64(b, 0);
-
-	write_f64(b, mat[0, 3]);
-	write_f64(b, mat[1, 3]);
-	write_f64(b, mat[2, 3]);
-	write_f64(b, 1);
+	values := transmute([4*4*size_of(f64)]byte)(mat)
+	bytes.buffer_write(b, values[:])
 }
 
 write_grid :: proc(b: ^bytes.Buffer, vdb: ^VDB, mat: matrix[4, 4]f64) {
